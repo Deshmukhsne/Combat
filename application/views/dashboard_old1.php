@@ -25,10 +25,9 @@ function mask_aadhaar($aadhaar) {
       --leaf-green:#137a3f;     /* deep Indian green */
       --indigo:#0b3d91;         /* deep indigo (chakra-like) */
       --muted:#c7c9c6;          /* muted light text */
-      --glass: rgba(255,255,255,0.10);     /* Slightly stronger white */
-      --glass-strong: rgba(255,255,255,0.18);
-      --glass-border: rgba(255,255,255,0.25);
-      --panel: rgba(10,16,30,0.65);
+--glass: rgba(255,255,255,0.10);     /* Slightly stronger white */
+--glass-strong: rgba(255,255,255,0.18);
+--glass-border: rgba(255,255,255,0.25);      --panel: rgba(10,16,30,0.65);
     }
 
     body{
@@ -67,11 +66,14 @@ function mask_aadhaar($aadhaar) {
   box-shadow: 0 10px 40px rgba(0,0,0,0.45);
   transition: all .3s ease;
 }
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 60px rgba(0,0,0,0.6);
+}
     .table thead th{border-bottom:1px solid rgba(255,255,255,0.04); color:var(--offwhite)}
     .table tbody tr{border-bottom:1px dashed rgba(255,255,255,0.03)}
-    .table{
-      --bs-table-bg: #9fc5ee;
-    }
+
     .sky{
       position: absolute; left:0; right:0; top:0; height:140px; pointer-events:none; overflow:visible;
     }
@@ -236,7 +238,7 @@ function mask_aadhaar($aadhaar) {
           </div>
 
           <div class="table-responsive">
-            <table class="table table-borderless align-middle mb-0">
+            <table class="table table-dark table-borderless align-middle mb-0">
               <thead>
                 <tr>
                   <th></th>
@@ -327,7 +329,7 @@ function mask_aadhaar($aadhaar) {
     </div>
 
     <footer class="mt-4 text-center small text-">
-      United We Stand Foundation • Manasvi Tech Solutions Pvt Ltd &copy; 2025
+      United We Stand Foundation • Combat Army Aviation Training School (CATS)
     </footer>
   </div>
 

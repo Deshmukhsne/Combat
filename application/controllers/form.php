@@ -11,6 +11,7 @@ class Form extends CI_Controller
         $this->load->library('session');
         $this->load->database(); // ensure DB is loaded
         $this->load->library('upload'); // load here for clarity
+        $this->load->model('Form_model'); // Make sure this line exists
     }
 
     public function registration()
@@ -52,7 +53,7 @@ class Form extends CI_Controller
         $data = [
             'full_name'        => $this->input->post('full_name'),
             'aadhaar_number'   => $this->input->post('aadhaar_number'),
-            'aadhaar_file'     => $aadhaar_file,                        // match table column
+            'aadhaar_image'     => $aadhaar_file,                        // match table column
             'mobile_number'    => $this->input->post('mobile_number'),
             'email'            => $this->input->post('email'),
             'emergency_name'   => $this->input->post('emergency_name'),
@@ -96,5 +97,25 @@ class Form extends CI_Controller
         }
 
         redirect('form/registration');
+    }
+
+    // Show registrations in a table
+    public function view_registrations()
+    {
+        $data['registrations'] = $this->Form_model->get_all_registrations();
+        $this->load->view('view_registrations', $data);
+    }
+
+    // Handle Accept/Reject button clicks (AJAX)
+    public function update_status()
+    {
+        $id = $this->input->post('id');
+        $status = $this->input->post('status');
+
+        if ($this->Form_model->update_status($id, $status)) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
     }
 }
