@@ -118,4 +118,10 @@ class Form extends CI_Controller
             echo json_encode(['success' => false]);
         }
     }
+
+     public function view_registration($id) {
+        $data['student'] = $this->Form_model->get_registration_by_id($id);
+        $this->load->view('superadmin/Student_detail', $data);
+    }
+    
 }

@@ -14,5 +14,10 @@ class Form_model extends CI_Model
         $this->db->where('id', $id);
         return $this->db->update('registration', ['status' => $status]);
     }
+
+    public function get_registration_by_id($id) {
+        return $this->db->where('id', $id)->get('registration')->row_array();
+    }
+
 }
 ?>

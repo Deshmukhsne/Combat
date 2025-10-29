@@ -24,7 +24,7 @@ class Dashboard_model extends CI_Model {
      */
     public function get_total_qr_issued()
     {
-        $this->db->from('registration')->where('aadhaar_file IS NOT NULL', null, false);
+        $this->db->from('registration')->where('aadhaar_image IS NOT NULL', null, false);
         return (int) $this->db->count_all_results();
     }
 
@@ -48,7 +48,7 @@ class Dashboard_model extends CI_Model {
     public function get_open_alerts()
     {
         // Example fallback: count rows with missing aadhaar_file (needs verification)
-        $this->db->from('registration')->where('aadhaar_file IS NULL', null, false);
+        $this->db->from('registration')->where('aadhaar_image IS NULL', null, false);
         return (int) $this->db->count_all_results();
     }
 
@@ -58,7 +58,7 @@ class Dashboard_model extends CI_Model {
     public function get_recent_registrants($limit = 10)
     {
         $q = $this->db
-            ->select("id, full_name, aadhaar_number, aadhaar_file, mobile_number, email, created_at")
+            ->select("id, full_name, aadhaar_number, aadhaar_image, mobile_number, email, created_at")
             ->order_by('created_at', 'DESC')
             ->limit((int)$limit)
             ->get('registration');
@@ -72,10 +72,10 @@ class Dashboard_model extends CI_Model {
             $r->aadhaar = $r->aadhaar_number ?? '';
             $r->phone = $r->mobile_number ?? '';
             // photo_url — derive from aadhaar_file if you store files under uploads/
-            $r->photo_url = !empty($r->aadhaar_file) ? base_url('uploads/aadhaar/' . $r->aadhaar_file) : null;
+            $r->photo_url = !empty($r->aadhaar_image) ? base_url('uploads/aadhaar/' . $r->aadhaar_image) : null;
 
             // stub qr_status and checked_in (adjust if you implement them)
-            $r->qr_status = !empty($r->aadhaar_file) ? 'issued' : 'pending';
+            $r->qr_status = !empty($r->aadhaar_image) ? 'issued' : 'pending';
             $r->checked_in = 0;
         }
         unset($r);
