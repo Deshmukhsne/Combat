@@ -288,57 +288,91 @@ function mask_aadhaar($aadhaar) {
           </div>
 
          <!-- table-scroll keeps the header sticky and the body scrollable -->
-<div class="table-scroll">
-  <table class="table table-borderless align-middle mb-0"><thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Aadhaar (masked)</th>
-                  <th>Phone</th>
-                  <th>QR</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="registrantsTable">
-                <?php if (!empty($recentRegistrants)): ?>
-                  <?php foreach ($recentRegistrants as $r): ?>
-                    <?php
-                      $id = (int)($r->id ?? 0);
-                      $name = htmlspecialchars($r->name ?? '—', ENT_QUOTES, 'UTF-8');
-                      $aad = mask_aadhaar($r->aadhaar ?? '');
-                      $phone = htmlspecialchars($r->phone ?? '—', ENT_QUOTES, 'UTF-8');
-                      $qr_status = strtolower(trim((string)($r->qr_status ?? ($r->qr_issued ?? 0 ? 'issued' : 'pending'))));
-                      $checked = !empty($r->checked_in);
-                      $photo = !empty($r->photo_url) ? htmlspecialchars($r->photo_url, ENT_QUOTES, 'UTF-8') : 'https://via.placeholder.com/48x48.png?text=ID';
-                    ?>
-                    <tr>
-                      <td><?php echo $name; ?></td>
-                      <td><?php echo $aad; ?></td>
-                      <td><?php echo $phone; ?></td>
-                      <td>
-                        <?php if ($qr_status === 'issued' || $qr_status === '1'): ?>
-                          <span class="badge bg-secondary">Issued</span>
-                        <?php else: ?>
-                          <span class="badge bg-warning text-dark">Pending</span>
-                        <?php endif; ?>
-                      </td>
-                      <td>
-                        <?php if ($checked): ?>
-                          <span class="badge bg-success">Checked-in</span>
-                        <?php else: ?>
-                          <span class="badge bg-secondary">Awaiting</span>
-                        <?php endif; ?>
-                      </td>
-                      <td><button class="btn btn-sm btn-outline-light" onclick="openDetails(<?php echo $id; ?>)"><i class="fa-solid fa-eye"></i></button></td>
-                    </tr>
-                  <?php endforeach; ?>
-                <?php else: ?>
-                  <tr><td colspan="7" class="text-center text-">No recent registrants</td></tr>
-                <?php endif; ?>
-              </tbody>
-            </table>
-          </div>
-        </div>
+<!-- table-scroll keeps the header sticky and the body scrollable -->
+<div class="table-scroll" aria-live="polite">
+  <table class="table table-borderless align-middle mb-0" role="table" aria-label="Recent registrants">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Aadhaar (masked)</th>
+        <th>Phone</th>
+        <th>QR</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody id="registrantsTable">
+      <?php
+      // Defensive check: ensure $recentRegistrants is iterable and not empty
+      $hasRows = !empty($recentRegistrants) && (is_array($recentRegistrants) || (is_object($recentRegistrants) && count((array)$recentRegistrants) > 0));
+      if ($hasRows):
+        foreach ($recentRegistrants as $r):
+          // map and sanitize fields defensively
+          $id = isset($r->id) ? (int)$r->id : 0;
+
+          // Name: fallback to full_name if name missing
+          $raw_name = isset($r->name) ? (string)$r->name : (isset($r->full_name) ? (string)$r->full_name : '—');
+          $name_safe = htmlspecialchars($raw_name, ENT_QUOTES, 'UTF-8');
+          $name_display = mb_strlen($raw_name) > 34 ? htmlspecialchars(mb_substr($raw_name,0,31) . '...', ENT_QUOTES, 'UTF-8') : $name_safe;
+
+          // Aadhaar and phone
+          $raw_aad = isset($r->aadhaar) ? (string)$r->aadhaar : (isset($r->aadhaar_number) ? (string)$r->aadhaar_number : '');
+          $aad_masked = htmlspecialchars(mask_aadhaar($raw_aad), ENT_QUOTES, 'UTF-8');
+
+          $raw_phone = isset($r->phone) ? (string)$r->phone : (isset($r->mobile_number) ? (string)$r->mobile_number : '—');
+          $phone_safe = htmlspecialchars($raw_phone, ENT_QUOTES, 'UTF-8');
+
+          // Status fallbacks
+          $qr_status = isset($r->qr_status) ? strtolower(trim((string)$r->qr_status)) : (isset($r->aadhaar_file) && !empty($r->aadhaar_file) ? 'issued' : 'pending');
+          $checked = !empty($r->checked_in) && ($r->checked_in == 1);
+      ?>
+      <tr data-id="<?php echo $id; ?>">
+        <td style="min-width:220px;">
+          <span class="avatar-initial rounded me-2" style="display:inline-grid;place-items:center;width:40px;height:40px;background:linear-gradient(135deg,var(--indigo),var(--leaf-green));color:#fff;font-weight:700;border-radius:8px;">
+            <?php echo htmlspecialchars(mb_strtoupper(mb_substr(trim($raw_name),0,1)), ENT_QUOTES, 'UTF-8'); ?>
+          </span>
+          <span style="vertical-align:middle;color:var(--offwhite);font-weight:600;">
+            <?php echo $name_display; ?>
+          </span>
+        </td>
+
+        <td><?php echo $aad_masked; ?></td>
+        <td><?php echo $phone_safe; ?></td>
+
+        <td>
+          <?php if ($qr_status === 'issued' || $qr_status === '1'): ?>
+            <span class="badge bg-secondary">Issued</span>
+          <?php else: ?>
+            <span class="badge bg-warning text-dark">Pending</span>
+          <?php endif; ?>
+        </td>
+
+        <td>
+          <?php if ($checked): ?>
+            <span class="badge bg-success">Checked-in</span>
+          <?php else: ?>
+            <span class="badge bg-secondary">Awaiting</span>
+          <?php endif; ?>
+        </td>
+
+        <td>
+          <button class="btn btn-sm btn-outline-light" onclick="openDetails(<?php echo $id; ?>)" aria-label="View details for <?php echo $name_safe; ?>">
+            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+          </button>
+        </td>
+      </tr>
+      <?php
+        endforeach;
+      else:
+      ?>
+      <tr>
+        <td colspan="6" class="text-center" style="color:var(--muted)">No recent registrants</td>
+      </tr>
+      <?php endif; ?>
+    </tbody>
+  </table>
+</div>        </div>
       </div>
 
       <div class="col-lg-4">
