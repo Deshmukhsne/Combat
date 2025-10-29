@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Secure Registration Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         /* 🌈 Background Animation */
@@ -20,6 +21,7 @@
             font-family: "Poppins", sans-serif;
             padding: 20px;
             overflow-x: hidden;
+            position: relative;
         }
 
         @keyframes gradientMove {
@@ -36,69 +38,141 @@
             }
         }
 
-        /* 🚁 Helicopter Animation */
+        /* 🚁 Enhanced Helicopter Animation */
         .helicopter {
             position: fixed;
-            top: 120px;
+            top: 100px;
             left: -150px;
-            width: 140px;
-            animation: flyAcross 16s linear infinite, hoverMotion 2s ease-in-out infinite;
+            width: 120px;
+            animation: flyAcross 20s ease-in-out infinite;
             z-index: 1000;
             filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
-            transform: scaleX(1);
-            /* Facing right direction */
+            transform-origin: center;
         }
 
-        /* 🔄 Helicopter Flight Path */
         @keyframes flyAcross {
             0% {
-                transform: translateX(-200px) scaleX(1);
+                transform: translateX(-200px) translateY(0) rotate(0deg);
+            }
+
+            10% {
+                transform: translateX(15vw) translateY(50px) rotate(5deg);
+            }
+
+            20% {
+                transform: translateX(30vw) translateY(-30px) rotate(-3deg);
+            }
+
+            30% {
+                transform: translateX(45vw) translateY(70px) rotate(4deg);
+            }
+
+            40% {
+                transform: translateX(60vw) translateY(-20px) rotate(-2deg);
             }
 
             50% {
-                transform: translateX(calc(100vw + 200px)) translateY(-20px) scaleX(1);
+                transform: translateX(75vw) translateY(40px) rotate(3deg);
+            }
+
+            60% {
+                transform: translateX(90vw) translateY(-50px) rotate(-4deg);
+            }
+
+            70% {
+                transform: translateX(105vw) translateY(30px) rotate(2deg);
+            }
+
+            80% {
+                transform: translateX(120vw) translateY(-40px) rotate(-3deg);
+            }
+
+            90% {
+                transform: translateX(135vw) translateY(60px) rotate(4deg);
             }
 
             100% {
-                transform: translateX(-200px) scaleX(1);
+                transform: translateX(150vw) translateY(0) rotate(0deg);
             }
         }
 
-        /* 🌀 Gentle Hover Motion */
-        @keyframes hoverMotion {
+        /* Add helicopter shadow */
+        .helicopter::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            filter: blur(5px);
+            animation: shadowMove 20s ease-in-out infinite;
+        }
+
+        @keyframes shadowMove {
+            0% {
+                transform: translateX(-50%) scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: translateX(-50%) scale(1.2);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 0.3;
+            }
+        }
+
+        /* Add rotor animation */
+        .rotor {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            animation: rotorSpin 0.1s linear infinite;
+        }
+
+        @keyframes rotorSpin {
+            0% {
+                transform: translateX(-50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translateX(-50%) rotate(360deg);
+            }
+        }
+
+        /* Add blinking light */
+        .light {
+            position: absolute;
+            top: 25px;
+            right: 20px;
+            width: 8px;
+            height: 8px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
 
             0%,
-            100% {
-                transform: translateY(0);
-            }
-
             50% {
-                transform: translateY(-8px);
-            }
-        }
-
-        /* ✨ Spinning Rotor Effect */
-        .helicopter::after {
-            content: "";
-            position: absolute;
-            top: -10px;
-            left: 25px;
-            width: 90px;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 4px;
-            animation: spinRotor 0.12s linear infinite;
-            transform-origin: center center;
-            filter: blur(1.5px);
-        }
-
-        @keyframes spinRotor {
-            0% {
-                transform: rotate(0deg);
+                opacity: 1;
             }
 
+            51%,
             100% {
-                transform: rotate(360deg);
+                opacity: 0;
             }
         }
 
@@ -112,6 +186,8 @@
             width: 100%;
             max-width: 700px;
             transition: all 0.3s ease;
+            position: relative;
+            z-index: 100;
         }
 
         .registration-container:hover {
@@ -231,8 +307,12 @@
 
 <body>
 
-    <!-- 🚁 Flying Helicopter -->
-    <img src="<?php echo base_url('assets/images/helicopter.png'); ?>" alt="Helicopter" class="helicopter">
+    <!-- 🚁 Enhanced Flying Helicopter -->
+    <div class="helicopter">
+        <div class="rotor"></div>
+        <div class="light"></div>
+        <img src="<?php echo base_url('assets/images/helicopter.png'); ?>" alt="Helicopter">
+    </div>
 
     <div class="container">
         <div class="row justify-content-center align-items-center g-4">
@@ -255,7 +335,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Aadhaar Number <span>*</span></label>
                                 <input type="text" name="aadhaar_number" class="form-control" maxlength="12"
-                                    placeholder="Enter  Aadhaar number" required>
+                                    placeholder="Enter 12-digit Aadhaar number" required>
                             </div>
 
                             <div class="mb-3">
@@ -271,8 +351,8 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email Address </label>
-                                    <input type="email" name="email" class="form-control" placeholder="Enter your email ">
+                                    <label class="form-label">Email Address (optional for e-pass)</label>
+                                    <input type="email" name="email" class="form-control" placeholder="Enter your email (optional)">
                                 </div>
                             </div>
 

@@ -19,7 +19,6 @@
             justify-content: center;
             font-family: "Poppins", sans-serif;
             padding: 20px;
-            overflow-x: hidden;
         }
 
         @keyframes gradientMove {
@@ -33,72 +32,6 @@
 
             100% {
                 background-position: 0% 50%;
-            }
-        }
-
-        /* 🚁 Helicopter Animation */
-        .helicopter {
-            position: fixed;
-            top: 120px;
-            left: -150px;
-            width: 140px;
-            animation: flyAcross 16s linear infinite, hoverMotion 2s ease-in-out infinite;
-            z-index: 1000;
-            filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
-            transform: scaleX(1);
-            /* Facing right direction */
-        }
-
-        /* 🔄 Helicopter Flight Path */
-        @keyframes flyAcross {
-            0% {
-                transform: translateX(-200px) scaleX(1);
-            }
-
-            50% {
-                transform: translateX(calc(100vw + 200px)) translateY(-20px) scaleX(1);
-            }
-
-            100% {
-                transform: translateX(-200px) scaleX(1);
-            }
-        }
-
-        /* 🌀 Gentle Hover Motion */
-        @keyframes hoverMotion {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
-        }
-
-        /* ✨ Spinning Rotor Effect */
-        .helicopter::after {
-            content: "";
-            position: absolute;
-            top: -10px;
-            left: 25px;
-            width: 90px;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 4px;
-            animation: spinRotor 0.12s linear infinite;
-            transform-origin: center center;
-            filter: blur(1.5px);
-        }
-
-        @keyframes spinRotor {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
             }
         }
 
@@ -119,13 +52,16 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
         }
 
+        /* 🇮🇳 Flag Strip */
         .flag-strip {
             height: 8px;
             background: linear-gradient(to right, #FF9933, #FFFFFF, #138808);
         }
 
+        /* 📋 Form */
         .registration-form {
             padding: 20px 25px;
+            /* height: 800px; */
         }
 
         .form-title {
@@ -160,6 +96,7 @@
             box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
         }
 
+        /* 🟩 Button */
         .btn-flag {
             background: linear-gradient(90deg, #FF9933, #138808);
             border: none;
@@ -181,6 +118,7 @@
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
         }
 
+        /* 🧾 Footer */
         .form-footer {
             text-align: center;
             margin-top: 20px;
@@ -188,6 +126,7 @@
             color: #555;
         }
 
+        /* 🖼️ Image Side (Outside Form) */
         .image-section {
             display: flex;
             align-items: center;
@@ -217,6 +156,7 @@
             }
         }
 
+        /* 📱 Responsive */
         @media (max-width: 992px) {
             .image-section {
                 display: none;
@@ -231,11 +171,9 @@
 
 <body>
 
-    <!-- 🚁 Flying Helicopter -->
-    <img src="<?php echo base_url('assets/images/helicopter.png'); ?>" alt="Helicopter" class="helicopter">
-
     <div class="container">
         <div class="row justify-content-center align-items-center g-4">
+
             <!-- Left: Registration Form -->
             <div class="col-lg-7">
                 <div class="registration-container">
@@ -249,13 +187,14 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Full Name (as per Aadhaar) <span>*</span></label>
-                                <input type="text" name="full_name" class="form-control" placeholder="Enter your full name" required>
+                                <input type="text" name="full_name" class="form-control"
+                                    placeholder="Enter your full name" required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Aadhaar Number <span>*</span></label>
                                 <input type="text" name="aadhaar_number" class="form-control" maxlength="12"
-                                    placeholder="Enter  Aadhaar number" required>
+                                    placeholder="Enter 12-digit Aadhaar number" required>
                             </div>
 
                             <div class="mb-3">
@@ -271,10 +210,12 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email Address </label>
-                                    <input type="email" name="email" class="form-control" placeholder="Enter your email ">
+                                    <label class="form-label">Email Address (optional for e-pass)</label>
+                                    <input type="email" name="email" class="form-control"
+                                        placeholder="Enter your email (optional)">
                                 </div>
                             </div>
+
 
                             <!-- Emergency Contact Section -->
                             <div class="row">
@@ -320,6 +261,7 @@
             });
         </script>
     <?php endif; ?>
+
 </body>
 
 </html>
