@@ -131,54 +131,43 @@
 
             <h3 class="form-title">Secure Registration Form</h3>
 
-            <form action="<?= base_url('form/submit_registration') ?>"
-                method="post"
-                enctype="multipart/form-data">
-
-                <!-- Full Name -->
+            <form action="<?php echo site_url('form/submit_registration'); ?>" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">Full Name (as per Aadhaar) <span>*</span></label>
-                    <input type="text" name="full_name" class="form-control" placeholder="Enter full name" required>
+                    <input type="text" name="full_name" class="form-control" required>
                 </div>
 
-                <!-- Aadhaar Number -->
                 <div class="mb-3">
                     <label class="form-label">Aadhaar Number <span>*</span></label>
-                    <input type="text" name="aadhaar_number" class="form-control" placeholder="Enter 12-digit Aadhaar number" maxlength="12" required>
+                    <input type="text" name="aadhaar_number" class="form-control" maxlength="12" required>
                 </div>
 
-                <!-- Aadhaar Photo -->
                 <div class="mb-3">
                     <label class="form-label">Upload Aadhaar Photo/Image <span>*</span></label>
                     <input type="file" name="userfile" class="form-control" accept="image/*" required>
-
                 </div>
 
-                <!-- Mobile Number -->
                 <div class="mb-3">
                     <label class="form-label">Mobile Contact Number <span>*</span></label>
-                    <input type="tel" name="mobile_number" class="form-control" placeholder="Enter mobile number" maxlength="10" required>
+                    <input type="tel" name="mobile_number" class="form-control" maxlength="10" required>
                 </div>
 
-                <!-- Email Address -->
                 <div class="mb-3">
                     <label class="form-label">Email Address (optional for e-pass)</label>
-                    <input type="email" name="email" class="form-control" placeholder="Enter email address (optional)">
+                    <input type="email" name="email" class="form-control">
                 </div>
 
-                <!-- Emergency Contact -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Emergency Contact Name <span>*</span></label>
-                        <input type="text" name="emergency_name" class="form-control" placeholder="Enter emergency contact name" required>
+                        <input type="text" name="emergency_name" class="form-control" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Emergency Contact Number <span>*</span></label>
-                        <input type="tel" name="emergency_number" class="form-control" placeholder="Enter emergency contact number" maxlength="10" required>
+                        <input type="tel" name="emergency_number" class="form-control" maxlength="10" required>
                     </div>
                 </div>
 
-                <!-- Submit Button -->
                 <button type="submit" class="btn btn-flag mt-2">Submit Registration</button>
 
                 <div class="form-footer">
@@ -187,7 +176,20 @@
             </form>
         </div>
     </div>
-
+    <!-- SweetAlert2 for friendly flash messages -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php if ($this->session->flashdata('alert')):
+        $alert = $this->session->flashdata('alert'); ?>
+        <script>
+            Swal.fire({
+                icon: '<?= htmlspecialchars($alert['type'], ENT_QUOTES, 'UTF-8') ?>',
+                title: '<?= htmlspecialchars($alert['message'], ENT_QUOTES, 'UTF-8') ?>',
+                showConfirmButton: true,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>
