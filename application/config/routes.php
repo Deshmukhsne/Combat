@@ -53,3 +53,9 @@ $route['default_controller'] = 'welcome';
 $route['translate_uri_dashes'] = FALSE;
 $route['404_override'] = '';
 $route['form/submit_registration'] = 'form/submit_registration';
+
+$route['registrations'] = 'dashboard/view_registrations';
+
+$route['new-registration'] = 'dashboard/registration_form';
+
+$route['export-registrants'] = 'dashboard/export_csv';

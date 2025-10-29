@@ -169,6 +169,10 @@ function mask_aadhaar($aadhaar) {
   border-radius: 8px;
   border: 2px solid rgba(0,0,0,0.12);
 }
+
+.form-control-sm{
+  border-radius:10px;
+}
   </style>
 </head>
 <body class="camo-bg">
@@ -235,7 +239,7 @@ function mask_aadhaar($aadhaar) {
               <div class="value"><?php echo number_format((int) ($qrIssued ?? 0)); ?></div>
             </div>
             <div class="text-end">
-              <i class="fa-solid fa-qrcode fa-2x" style="color:var(--leaf-green)"></i>
+              <i class="fa-solid fa-qrcode fa-2x" style="color:var(--saffron)"></i>
             </div>
           </div>
           <div class="ribbon mt-3"></div>
@@ -251,7 +255,7 @@ function mask_aadhaar($aadhaar) {
               <div class="value"><?php echo number_format((int) ($checkedIn ?? 0)); ?></div>
             </div>
             <div class="text-end">
-              <i class="fa-solid fa-check-circle fa-2x" style="color:var(--leaf-green)"></i>
+              <i class="fa-solid fa-check-circle fa-2x" style="color:var(--saffron)"></i>
             </div>
           </div>
           <div class="ribbon mt-3"></div>
@@ -282,7 +286,7 @@ function mask_aadhaar($aadhaar) {
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Recent Registrants</h5>
             <div class="d-flex gap-2">
-              <input class="form-control form-control-sm" id="searchBox" placeholder="Search by name / Aadhaar / phone" />
+              <input class="form-control form-control-sm" id="searchBox" placeholder="Search Here" />
               <button class="btn btn-sm btn-outline-light" id="btnExport"><i class="fa-solid fa-file-arrow-down"></i> Export</button>
             </div>
           </div>
@@ -341,12 +345,18 @@ function mask_aadhaar($aadhaar) {
         <td><?php echo $phone_safe; ?></td>
 
         <td>
-          <?php if ($qr_status === 'issued' || $qr_status === '1'): ?>
-            <span class="badge bg-secondary">Issued</span>
-          <?php else: ?>
-            <span class="badge bg-warning text-dark">Pending</span>
-          <?php endif; ?>
-        </td>
+  <?php
+    $status = isset($r->status) ? strtolower(trim($r->status)) : 'unknown';
+    if ($status === 'approved' || $status === 'accepted'): ?>
+      <span class="badge bg-success text-light">Approved</span>
+  <?php elseif ($status === 'pending'): ?>
+      <span class="badge bg-warning text-dark">Pending</span>
+  <?php elseif ($status === 'rejected'): ?>
+      <span class="badge bg-danger text-light">Rejected</span>
+  <?php else: ?>
+      <span class="badge bg-secondary text-light"><?php echo ucfirst($status); ?></span>
+  <?php endif; ?>
+</td>
 
         <td>
           <?php if ($checked): ?>
@@ -380,8 +390,12 @@ function mask_aadhaar($aadhaar) {
           <h6>Quick Actions</h6>
           <div class="d-grid gap-2 mt-2">
             <button class="btn btn-light" onclick="openScanner()"><i class="fa-solid fa-qrcode"></i> Open QR Scanner</button>
-            <button class="btn btn-outline-light" onclick="openRegistration()"><i class="fa-solid fa-user-plus"></i> New Registration</button>
-            <button class="btn btn-outline-light" onclick="bulkIssue()"><i class="fa-solid fa-ticket"></i> Issue QR Batch</button>
+<a href="<?php echo site_url('new-registration'); ?>" class="btn btn-outline-light">
+  <i class="fa-solid fa-user-plus"></i> New Registration
+</a>
+<a href="<?php echo site_url('registrations'); ?>" class="btn btn-outline-light">
+  <i class="fa-solid fa-ticket"></i> View All Registrations
+</a>
             <button class="btn btn-outline-light" onclick="showHelp()"><i class="fa-solid fa-circle-info"></i> SOP & Help</button>
           </div>
 
@@ -453,11 +467,10 @@ function mask_aadhaar($aadhaar) {
       }
 
       if (btnExport) {
-        btnExport.addEventListener('click', function(){
-          // Replace with a real endpoint e.g. /CiFresh/index.php/dashboard/export
-          alert('Export CSV via backend endpoint: /CiFresh/index.php/dashboard/export (implement server-side)');
-        });
-      }
+  btnExport.addEventListener('click', function(){
+    window.location.href = "<?php echo site_url('export-registrants'); ?>";
+  });
+}
     });
 
     function openDetails(id){
