@@ -14,52 +14,64 @@ function mask_aadhaar($aadhaar) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UWS — CATS Registration Dashboard (Army Theme)</title>
+  <title>UWS — CATS Registration Dashboard (Tricolor Theme)</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* Army colour palette */
+    /* Tricolor-inspired palette (not a direct flag reproduction) */
     :root{
-      --army-olive:#3b4b2a;
-      --army-dark:#1f2b16;
-      --khaki:#c9b77a;
-      --accent:#9fb24a;
-      --muted:#9aa48a;
-      --glass: rgba(255,255,255,0.04);
+      --saffron:#ff9933;        /* warm saffron accent */
+      --offwhite:#fff;       /* soft white for surfaces & text highlights */
+      --leaf-green:#137a3f;     /* deep Indian green */
+      --indigo:#0b3d91;         /* deep indigo (chakra-like) */
+      --muted:#c7c9c6;          /* muted light text */
+--glass: rgba(255,255,255,0.10);     /* Slightly stronger white */
+--glass-strong: rgba(255,255,255,0.18);
+--glass-border: rgba(255,255,255,0.25);      --panel: rgba(10,16,30,0.65);
     }
 
     body{
-      background: linear-gradient(180deg, #0f1310 0%, #162016 60%);
-      color: #e6efe1;
+      /* deep indigo night with subtle saffron glow */
+      background: linear-gradient(180deg, #04102b 0%, rgba(11,61,145,0.18) 40%, #031028 100%);
+      color: var(--offwhite);
       font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       min-height:100vh;
       padding-top:1rem;
     }
 
-    .camo-bg{
+    /* .camo-bg{
       background-image:
-        radial-gradient(circle at 10% 10%, rgba(63,76,48,0.12) 0%, transparent 15%),
-        radial-gradient(circle at 80% 20%, rgba(120,118,80,0.06) 0%, transparent 18%),
-        radial-gradient(circle at 40% 70%, rgba(50,60,40,0.07) 0%, transparent 20%);
+        radial-gradient(circle at 8% 12%, rgba(255,153,51,0.06) 0%, transparent 18%),
+        radial-gradient(circle at 85% 20%, rgba(19,122,63,0.04) 0%, transparent 20%),
+        radial-gradient(circle at 40% 72%, rgba(11,61,145,0.03) 0%, transparent 22%);
       background-blend-mode: overlay;
-    }
+    } */
 
-    .top-bar{
-      backdrop-filter: blur(6px);
-      background: linear-gradient(90deg, rgba(59,75,42,0.12), rgba(25,35,20,0.06));
-      border:1px solid rgba(255,255,255,0.03);
-      padding: .6rem 1rem;
-      border-radius: .6rem;
-    }
+   .top-bar {
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+}
 
     .brand-title{font-weight:700; letter-spacing:1px}
     .brand-sub{color:var(--muted); font-size:.85rem}
 
-    .stat-card{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03);}
-    .stat-card .value{font-size:1.6rem; font-weight:700}
-    .stat-card .label{color:var(--muted); font-size:.85rem}
+   .stat-card {
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+  transition: all .3s ease;
+}
 
-    .table thead th{border-bottom:1px solid rgba(255,255,255,0.04); color:#dfe9d8}
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 60px rgba(0,0,0,0.6);
+}
+    .table thead th{border-bottom:1px solid rgba(255,255,255,0.04); color:var(--offwhite)}
     .table tbody tr{border-bottom:1px dashed rgba(255,255,255,0.03)}
 
     .sky{
@@ -87,7 +99,7 @@ function mask_aadhaar($aadhaar) {
     .floaty{ animation: floaty 6s ease-in-out infinite; }
     @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
 
-    .ribbon{height:6px; border-radius:6px; background: linear-gradient(90deg, rgba(159,178,74,0.2), rgba(201,183,122,0.18)); margin-bottom:.8rem}
+    .ribbon{height:6px; border-radius:6px; background: linear-gradient(90deg, rgba(255,153,51,0.18), rgba(255,255,255,0.06), rgba(19,122,63,0.16)); margin-bottom:.8rem}
 
     @media (max-width:767px){
       .sky{height:90px}
@@ -96,6 +108,17 @@ function mask_aadhaar($aadhaar) {
 
     .btn, .form-control { transition: all .18s ease-in-out }
     a{ color:inherit }
+
+    /* Badge overrides to better match tricolor accents */
+    .badge.bg-secondary{ background: var(--indigo); color: var(--offwhite); }
+    .badge.bg-success{ background: var(--leaf-green); color: var(--offwhite); }
+    .badge.bg-warning{ background: #ffd29b; color: #2b2b2b; }
+
+    /* Buttons: primary-ish -> saffron, outline invert */
+    .btn-light{ background: rgba(255,255,255,0.06); color:var(--offwhite); border:1px solid rgba(255,255,255,0.04) }
+    .btn-outline-light{ border-color: rgba(255,255,255,0.06); color:var(--offwhite); }
+
+    footer{ color:var(--muted); }
   </style>
 </head>
 <body class="camo-bg">
@@ -104,23 +127,23 @@ function mask_aadhaar($aadhaar) {
   <div class="sky" aria-hidden="true">
     <svg class="plane p1" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
       <g>
-        <path fill="#9fb24a" d="M120 30 L560 80 L520 120 L140 70 Z" opacity="0.98"/>
-        <path fill="#3b4b2a" d="M40 140 L200 120 L360 140 L220 160 Z" opacity="0.85"/>
-        <circle cx="140" cy="95" r="10" fill="#c9b77a"/>
+        <path style="fill:var(--saffron);" d="M120 30 L560 80 L520 120 L140 70 Z" opacity="0.98"/>
+        <path style="fill:var(--indigo);" d="M40 140 L200 120 L360 140 L220 160 Z" opacity="0.85"/>
+        <circle cx="140" cy="95" r="10" style="fill:var(--offwhite);"/>
       </g>
     </svg>
 
     <svg class="plane p2" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
       <g>
-        <path fill="#c9b77a" d="M100 40 L520 80 L480 120 L120 90 Z" opacity="0.95"/>
-        <path fill="#22321a" d="M40 160 L210 120 L360 150 L200 170 Z" opacity="0.85"/>
+        <path style="fill:rgba(255,255,255,0.9);" d="M100 40 L520 80 L480 120 L120 90 Z" opacity="0.95"/>
+        <path style="fill:var(--leaf-green);" d="M40 160 L210 120 L360 150 L200 170 Z" opacity="0.85"/>
       </g>
     </svg>
 
     <svg class="plane p3" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
       <g>
-        <path fill="#8aa044" d="M140 20 L560 60 L520 100 L160 58 Z" opacity="0.95"/>
-        <circle cx="200" cy="110" r="8" fill="#e6efe1" opacity="0.9"/>
+        <path style="fill:var(--leaf-green);" d="M140 20 L560 60 L520 100 L160 58 Z" opacity="0.95"/>
+        <circle cx="200" cy="110" r="8" style="fill:var(--offwhite);" opacity="0.9"/>
       </g>
     </svg>
   </div>
@@ -128,12 +151,12 @@ function mask_aadhaar($aadhaar) {
   <div class="container py-4">
     <div class="top-bar d-flex align-items-center justify-content-between mb-3">
       <div>
-        <div class="brand-title">UWS — <span style="color:var(--khaki)">CATS</span> Registration Dashboard</div>
-        <div class="brand-sub">Secure QR-based entry & verification • Helicopter Show</div>
+        <div class="brand-title">UWS — <span style="color:var(--saffron)">CATS</span> Registration Dashboard</div>
+        <div class="brand-sub">Secure QR-based entry & verification • Tricolor-inspired theme</div>
       </div>
       <div class="text-end">
-        <div class="small text-muted">Module: <strong>Your Module</strong></div>
-        <div class="small text-muted">Host: PHP / LAMP-ready</div>
+        <div class="small text-">Module: <strong>Your Module</strong></div>
+        <div class="small text-">Host: PHP / LAMP-ready</div>
       </div>
     </div>
 
@@ -146,11 +169,11 @@ function mask_aadhaar($aadhaar) {
               <div class="value"><?php echo number_format((int) ($totalRegistrants ?? 0)); ?></div>
             </div>
             <div class="text-end">
-              <i class="fa-solid fa-users fa-2x" style="color:var(--khaki)"></i>
+              <i class="fa-solid fa-users fa-2x" style="color:var(--saffron)"></i>
             </div>
           </div>
           <div class="ribbon mt-3"></div>
-          <small class="text-muted">Updated: <?php echo date('d M Y'); ?></small>
+          <small class="text-">Updated: <?php echo date('d M Y'); ?></small>
         </div>
       </div>
 
@@ -162,11 +185,11 @@ function mask_aadhaar($aadhaar) {
               <div class="value"><?php echo number_format((int) ($qrIssued ?? 0)); ?></div>
             </div>
             <div class="text-end">
-              <i class="fa-solid fa-qrcode fa-2x" style="color:var(--accent)"></i>
+              <i class="fa-solid fa-qrcode fa-2x" style="color:var(--leaf-green)"></i>
             </div>
           </div>
           <div class="ribbon mt-3"></div>
-          <small class="text-muted">Pending manual checks: <?php echo max(0, (int)(($totalRegistrants ?? 0) - ($qrIssued ?? 0))); ?></small>
+          <small class="text-">Pending manual checks: <?php echo max(0, (int)(($totalRegistrants ?? 0) - ($qrIssued ?? 0))); ?></small>
         </div>
       </div>
 
@@ -178,11 +201,11 @@ function mask_aadhaar($aadhaar) {
               <div class="value"><?php echo number_format((int) ($checkedIn ?? 0)); ?></div>
             </div>
             <div class="text-end">
-              <i class="fa-solid fa-check-circle fa-2x" style="color:#6ee7b7"></i>
+              <i class="fa-solid fa-check-circle fa-2x" style="color:var(--leaf-green)"></i>
             </div>
           </div>
           <div class="ribbon mt-3"></div>
-          <small class="text-muted">Gates active: 4</small>
+          <small class="text-">Gates active: 4</small>
         </div>
       </div>
 
@@ -194,11 +217,11 @@ function mask_aadhaar($aadhaar) {
               <div class="value"><?php echo number_format((int) ($alerts ?? 0)); ?></div>
             </div>
             <div class="text-end">
-              <i class="fa-solid fa-triangle-exclamation fa-2x" style="color:#ffcc66"></i>
+              <i class="fa-solid fa-triangle-exclamation fa-2x" style="color:var(--saffron)"></i>
             </div>
           </div>
           <div class="ribbon mt-3"></div>
-          <small class="text-muted">Last: <?php echo date('d M Y H:i'); ?></small>
+          <small class="text-">Last: <?php echo date('d M Y H:i'); ?></small>
         </div>
       </div>
     </div>
@@ -262,7 +285,7 @@ function mask_aadhaar($aadhaar) {
                     </tr>
                   <?php endforeach; ?>
                 <?php else: ?>
-                  <tr><td colspan="7" class="text-center text-muted">No recent registrants</td></tr>
+                  <tr><td colspan="7" class="text-center text-">No recent registrants</td></tr>
                 <?php endif; ?>
               </tbody>
             </table>
@@ -283,11 +306,11 @@ function mask_aadhaar($aadhaar) {
           <hr class="my-3">
           <div>
             <h6 class="mb-1">Gate Status</h6>
-            <div class="d-flex justify-content-between small text-muted">
+            <div class="d-flex justify-content-between small text-">
               <div>Gate A <span class="badge bg-success ms-2">Open</span></div>
               <div>Gate B <span class="badge bg-success ms-2">Open</span></div>
             </div>
-            <div class="d-flex justify-content-between small text-muted mt-2">
+            <div class="d-flex justify-content-between small text- mt-2">
               <div>Gate C <span class="badge bg-secondary ms-2">Standby</span></div>
               <div>Gate D <span class="badge bg-secondary ms-2">Standby</span></div>
             </div>
@@ -305,7 +328,7 @@ function mask_aadhaar($aadhaar) {
       </div>
     </div>
 
-    <footer class="mt-4 text-center small text-muted">
+    <footer class="mt-4 text-center small text-">
       United We Stand Foundation • Combat Army Aviation Training School (CATS)
     </footer>
   </div>
@@ -319,7 +342,7 @@ function mask_aadhaar($aadhaar) {
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="detailBody">
-          <p class="text-muted" role="status">Select a registrant to view details</p>
+          <p class="text-" role="status">Select a registrant to view details</p>
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
@@ -359,7 +382,7 @@ function mask_aadhaar($aadhaar) {
       // For production: call your controller endpoint e.g. /CiFresh/index.php/dashboard/details/ID (return JSON)
       const body = document.getElementById('detailBody');
       if (!body) return;
-      body.innerHTML = '<p class="text-muted">Loading details for ID ' + id + '...</p>';
+      body.innerHTML = '<p class="text-">Loading details for ID ' + id + '...</p>';
       const modal = new bootstrap.Modal(document.getElementById('detailModal'));
       modal.show();
 
