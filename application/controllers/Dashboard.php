@@ -35,4 +35,33 @@ public function registration_form()
     $this->load->view('form/registration');
 }
 
+public function export_csv()
+{
+    $this->load->database();
+
+    // Fetch all registration data
+    $query = $this->db->get('registration');
+    $registrations = $query->result_array();
+
+    // Set CSV headers
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=registrations_' . date('Y-m-d_H-i-s') . '.csv');
+
+    // Open output stream
+    $output = fopen('php://output', 'w');
+
+    // Write the column headers
+    if (!empty($registrations)) {
+        fputcsv($output, array_keys($registrations[0]));
+    }
+
+    // Write the rows
+    foreach ($registrations as $row) {
+        fputcsv($output, $row);
+    }
+
+    fclose($output);
+    exit;
+}
+
 }

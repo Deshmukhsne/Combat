@@ -56,30 +56,37 @@ class Dashboard_model extends CI_Model {
      * Get recent registrants (maps DB columns to view-friendly object)
      */
     public function get_recent_registrants($limit = 10)
-    {
-        $q = $this->db
-            ->select("id, full_name, aadhaar_number, aadhaar_image, mobile_number, email, created_at")
-            ->order_by('created_at', 'DESC')
-            ->limit((int)$limit)
-            ->get('registration');
+{
+    $q = $this->db
+        ->select("id, full_name, aadhaar_number, aadhaar_image, mobile_number, email, status, created_at")
+        ->order_by('created_at', 'DESC')
+        ->limit((int)$limit)
+        ->get('registration');
 
-        $rows = $q->result();
+    $rows = $q->result();
 
-        // Normalize to fields expected by the view (name, aadhaar, phone, photo_url, qr_status, checked_in)
-        foreach ($rows as &$r) {
-            // map existing columns
-            $r->name = $r->full_name ?? '';
-            $r->aadhaar = $r->aadhaar_number ?? '';
-            $r->phone = $r->mobile_number ?? '';
-            // photo_url — derive from aadhaar_file if you store files under uploads/
-            $r->photo_url = !empty($r->aadhaar_image) ? base_url('uploads/aadhaar/' . $r->aadhaar_image) : null;
+    // Normalize to fields expected by the view (name, aadhaar, phone, photo_url, qr_status, checked_in)
+    foreach ($rows as &$r) {
+        $r->name = $r->full_name ?? '';
+        $r->aadhaar = $r->aadhaar_number ?? '';
+        $r->phone = $r->mobile_number ?? '';
 
-            // stub qr_status and checked_in (adjust if you implement them)
-            $r->qr_status = !empty($r->aadhaar_image) ? 'issued' : 'pending';
-            $r->checked_in = 0;
-        }
-        unset($r);
+        // Map photo URL (optional)
+        $r->photo_url = !empty($r->aadhaar_image)
+            ? base_url('uploads/aadhaar/' . $r->aadhaar_image)
+            : null;
 
-        return $rows;
+        // QR status logic remains same
+        $r->qr_status = !empty($r->aadhaar_image) ? 'issued' : 'pending';
+
+        // Add status (dynamic from DB)
+        $r->status = isset($r->status) ? strtolower(trim($r->status)) : 'unknown';
+
+        // checked_in placeholder
+        $r->checked_in = 0;
     }
+    unset($r);
+
+    return $rows;
+}
 }
