@@ -117,6 +117,58 @@ function mask_aadhaar($aadhaar) {
     .btn-outline-light{ border-color: rgba(255,255,255,0.06); color:var(--offwhite); }
 
     footer{ color:var(--muted); }
+
+
+
+    /* Scrollable table with sticky header — small & configurable */
+:root {
+  --table-max-height: 420px; /* change this to whatever height you want */
+}
+
+/* Container that scrolls (keeps table layout intact) */
+.table-scroll {
+  max-height: var(--table-max-height);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  /* preserve the card look if you want a background */
+}
+
+/* Keep header visible while body scrolls */
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  backdrop-filter: blur(6px); /* subtle glass behind header */
+}
+
+/* Make sure the header has a solid-ish backdrop so text is readable */
+.table-scroll thead th {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  color: var(--offwhite);
+}
+
+/* Ensure table fills width and layout is stable */
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+/* Slight row hover inside scroll area */
+.table-scroll tbody tr:hover {
+  transform: translateY(0); /* keep subtle, you can keep your previous hover if you like */
+  background: rgba(255,255,255,0.02);
+}
+
+/* Optional: nicer thin scrollbar (Chrome / Edge / Safari) */
+.table-scroll::-webkit-scrollbar { height:10px; width:10px; }
+.table-scroll::-webkit-scrollbar-track { background: transparent; }
+.table-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.12);
+}
   </style>
 </head>
 <body class="camo-bg">
@@ -235,11 +287,10 @@ function mask_aadhaar($aadhaar) {
             </div>
           </div>
 
-          <div class="table-responsive">
-            <table class="table table-borderless align-middle mb-0">
-              <thead>
+         <!-- table-scroll keeps the header sticky and the body scrollable -->
+<div class="table-scroll">
+  <table class="table table-borderless align-middle mb-0"><thead>
                 <tr>
-                  <th></th>
                   <th>Name</th>
                   <th>Aadhaar (masked)</th>
                   <th>Phone</th>
@@ -261,7 +312,6 @@ function mask_aadhaar($aadhaar) {
                       $photo = !empty($r->photo_url) ? htmlspecialchars($r->photo_url, ENT_QUOTES, 'UTF-8') : 'https://via.placeholder.com/48x48.png?text=ID';
                     ?>
                     <tr>
-                      <td><img src="<?php echo $photo; ?>" class="rounded" alt="photo" width="48" height="48"></td>
                       <td><?php echo $name; ?></td>
                       <td><?php echo $aad; ?></td>
                       <td><?php echo $phone; ?></td>
