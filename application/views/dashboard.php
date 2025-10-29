@@ -380,8 +380,12 @@ function mask_aadhaar($aadhaar) {
           <h6>Quick Actions</h6>
           <div class="d-grid gap-2 mt-2">
             <button class="btn btn-light" onclick="openScanner()"><i class="fa-solid fa-qrcode"></i> Open QR Scanner</button>
-            <button class="btn btn-outline-light" onclick="openRegistration()"><i class="fa-solid fa-user-plus"></i> New Registration</button>
-            <button class="btn btn-outline-light" onclick="bulkIssue()"><i class="fa-solid fa-ticket"></i> Issue QR Batch</button>
+<a href="<?php echo site_url('new-registration'); ?>" class="btn btn-outline-light">
+  <i class="fa-solid fa-user-plus"></i> New Registration
+</a>
+<a href="<?php echo site_url('registrations'); ?>" class="btn btn-outline-light">
+  <i class="fa-solid fa-ticket"></i> View All Registrations
+</a>
             <button class="btn btn-outline-light" onclick="showHelp()"><i class="fa-solid fa-circle-info"></i> SOP & Help</button>
           </div>
 

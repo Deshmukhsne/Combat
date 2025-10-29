@@ -20,4 +20,19 @@ class Dashboard extends CI_Controller {
 
         $this->load->view('dashboard', $data);
     }
+    public function view_registrations()
+{
+    // optional: fetch data from DB here
+    // $data['registrations'] = $this->Dashboard_model->get_all_registrations();
+
+    // load the view safely
+    $this->load->view('view_registrations');
+}
+
+public function registration_form()
+{
+    // optional: you can pass prefilled data or configs later
+    $this->load->view('form/registration');
+}
+
 }
