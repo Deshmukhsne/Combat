@@ -60,8 +60,7 @@
 
         /* 📋 Form */
         .registration-form {
-            padding: 20px 25px;
-            /* height: 800px; */
+            padding: 40px 45px;
         }
 
         .form-title {
@@ -85,7 +84,7 @@
 
         .form-control {
             border-radius: 12px;
-            padding: 8px 12px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
             transition: all 0.3s ease;
             font-size: 15px;
@@ -104,7 +103,7 @@
             font-weight: 700;
             width: 100%;
             border-radius: 50px;
-            padding: 8px;
+            padding: 14px;
             font-size: 16px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -202,20 +201,17 @@
                                 <input type="file" name="userfile" class="form-control" accept="image/*" required>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Mobile Contact Number <span>*</span></label>
-                                    <input type="tel" name="mobile_number" class="form-control" maxlength="10"
-                                        placeholder="Enter 10-digit number" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email Address (optional for e-pass)</label>
-                                    <input type="email" name="email" class="form-control"
-                                        placeholder="Enter your email (optional)">
-                                </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mobile Contact Number <span>*</span></label>
+                                <input type="tel" name="mobile_number" class="form-control" maxlength="10"
+                                    placeholder="Enter 10-digit number" required>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label">Email Address (optional for e-pass)</label>
+                                <input type="email" name="email" class="form-control"
+                                    placeholder="Enter your email (optional)">
+                            </div>
 
                             <!-- Emergency Contact Section -->
                             <div class="row">
