@@ -11,7 +11,6 @@ class Form extends CI_Controller
         $this->load->library('session');
         $this->load->database(); // ensure DB is loaded
         $this->load->library('upload'); // load here for clarity
-        $this->load->model('Form_model'); // Make sure this line exists
     }
 
     public function registration()
@@ -21,279 +20,130 @@ class Form extends CI_Controller
 
     public function submit_registration()
     {
-        // Configure upload
-        $config['upload_path'] = './uploads/aadhaar/';
+        // Configure upload defaults
+        $config['upload_path']   = './uploads/aadhaar/';
         $config['allowed_types'] = 'jpg|jpeg|png';
-        $config['max_size'] = 2048; // 2MB
-        $config['encrypt_name'] = TRUE;
+        $config['max_size']      = 2048; // 2MB
+        $config['encrypt_name']  = TRUE;
 
         // Create folder if not exists
         if (!is_dir($config['upload_path'])) {
             mkdir($config['upload_path'], 0777, TRUE);
         }
 
-        $this->upload->initialize($config);
+        // Normalize single-file uploads into array format so we can process one or many entries uniformly
+        if (isset($_FILES['userfile']) && isset($_FILES['userfile']['name']) && !is_array($_FILES['userfile']['name'])) {
+            foreach ($_FILES['userfile'] as $k => $v) {
+                $_FILES['userfile'][$k] = [$v];
+            }
+        }
 
-        // Aadhaar image upload
-        if (!$this->upload->do_upload('userfile')) {
-            $error_msg = $this->upload->display_errors('', '');
+        // Read posted arrays
+        $full_names = $this->input->post('full_name');
+        if (empty($full_names) || !is_array($full_names)) {
             $this->session->set_flashdata('alert', [
                 'type' => 'error',
-                'message' => 'Failed to upload Aadhaar image. Reason: ' . $error_msg
+                'message' => 'No registration data submitted.'
             ]);
             redirect('form/registration');
             return;
         }
 
-        $upload_data = $this->upload->data();
-        $aadhaar_file = $upload_data['file_name'];
+        $total = count($full_names);
+        $successful = 0;
+        $errors = [];
 
-        // Prepare form data
-        $data = [
-            'full_name' => $this->input->post('full_name'),
-            'aadhaar_number' => $this->input->post('aadhaar_number'),
-            'aadhaar_image' => $aadhaar_file,
-            'mobile_number' => $this->input->post('mobile_number'),
-            'email' => $this->input->post('email'),
-            'emergency_name' => $this->input->post('emergency_name'),
-            'emergency_number' => $this->input->post('emergency_number'),
-            'status' => 'pending',
-            'created_at' => date('Y-m-d H:i:s')
-        ];
+        // loop through each submitted registration and process (best-effort: continue on errors)
+        for ($i = 0; $i < $total; $i++) {
+            $aadhaar_file = null;
 
-        // Aadhaar validation
-        if (strlen($data['aadhaar_number']) !== 12 || !ctype_digit($data['aadhaar_number'])) {
-            $this->session->set_flashdata('alert', [
-                'type' => 'error',
-                'message' => 'Aadhaar number must be 12 digits.'
-            ]);
-            redirect('form/registration');
-            return;
+            // handle file for this index
+            if (isset($_FILES['userfile']['name'][$i]) && $_FILES['userfile']['name'][$i] !== '') {
+                // prepare a single-file array expected by CI Upload
+                $_FILES['userfile_single'] = [
+                    'name'     => $_FILES['userfile']['name'][$i],
+                    'type'     => $_FILES['userfile']['type'][$i],
+                    'tmp_name' => $_FILES['userfile']['tmp_name'][$i],
+                    'error'    => $_FILES['userfile']['error'][$i],
+                    'size'     => $_FILES['userfile']['size'][$i]
+                ];
+
+                // ensure upload library is initialized (reset per iteration)
+                $this->upload->initialize($config, TRUE);
+
+                if (!$this->upload->do_upload('userfile_single')) {
+                    $errors[] = 'Upload failed for entry #' . ($i + 1) . ': ' . $this->upload->display_errors('', '');
+                    // skip this entry and continue with others
+                    continue;
+                }
+
+                $upload_data = $this->upload->data();
+                $aadhaar_file = $upload_data['file_name'];
+            } else {
+                $errors[] = 'No Aadhaar image provided for entry #' . ($i + 1);
+                continue;
+            }
+
+            // collect fields (index-based arrays)
+            $full_name_val    = isset($_POST['full_name'][$i]) ? trim($_POST['full_name'][$i]) : null;
+            $aadhaar_number   = isset($_POST['aadhaar_number'][$i]) ? trim($_POST['aadhaar_number'][$i]) : null;
+            $mobile_number    = isset($_POST['mobile_number'][$i]) ? trim($_POST['mobile_number'][$i]) : null;
+            $email            = isset($_POST['email'][$i]) ? trim($_POST['email'][$i]) : null;
+            $emergency_name   = isset($_POST['emergency_name'][$i]) ? trim($_POST['emergency_name'][$i]) : null;
+            $emergency_number = isset($_POST['emergency_number'][$i]) ? trim($_POST['emergency_number'][$i]) : null;
+
+            // basic validation
+            if (empty($full_name_val) || empty($aadhaar_number) || empty($mobile_number) || empty($emergency_name) || empty($emergency_number)) {
+                $errors[] = 'Missing required fields for entry #' . ($i + 1);
+                // cleanup uploaded file for this index
+                @unlink($config['upload_path'] . $aadhaar_file);
+                continue;
+            }
+
+            if (strlen($aadhaar_number) !== 12 || !ctype_digit($aadhaar_number)) {
+                $errors[] = 'Aadhaar must be 12 digits for entry #' . ($i + 1);
+                @unlink($config['upload_path'] . $aadhaar_file);
+                continue;
+            }
+
+            // prepare data for insert
+            $data = [
+                'full_name'        => $full_name_val,
+                'aadhaar_number'   => $aadhaar_number,
+                'aadhaar_file'     => $aadhaar_file,
+                'mobile_number'    => $mobile_number,
+                'email'            => $email,
+                'emergency_name'   => $emergency_name,
+                'emergency_number' => $emergency_number,
+                'created_at'       => date('Y-m-d H:i:s')
+            ];
+
+            $insert_id = $this->RegistrationModel->insert_registration($data);
+            if ($insert_id) {
+                $successful++;
+                log_message('info', 'Registration inserted, id: ' . $insert_id . ', aadhaar: ' . $aadhaar_number);
+            } else {
+                $db_error = $this->db->error();
+                $errors[] = 'DB insert failed for entry #' . ($i + 1) . ': ' . (isset($db_error['message']) ? $db_error['message'] : 'unknown');
+                log_message('error', 'Registration insert failed. DB error: ' . json_encode($db_error));
+                @unlink($config['upload_path'] . $aadhaar_file);
+            }
         }
 
-        // Insert to DB
-        $insert_id = $this->RegistrationModel->insert_registration($data);
-
-        if ($insert_id) {
-            // Generate QR code automatically after registration
-
-
-            $this->session->set_flashdata('alert', [
-                'type' => 'success',
-                'message' => 'Registration successful!'
-            ]);
-        } else {
-            $db_error = $this->db->error();
-            log_message('error', 'DB insert failed: ' . json_encode($db_error));
-            $this->session->set_flashdata('alert', [
-                'type' => 'error',
-                'message' => 'Database insertion failed.'
-            ]);
-            @unlink($config['upload_path'] . $aadhaar_file);
+        // feedback
+        $msgParts = [];
+        if ($successful > 0) {
+            $msgParts[] = $successful . ' registration(s) saved.';
         }
+        if (!empty($errors)) {
+            $msgParts[] = 'Errors: ' . implode(' | ', $errors);
+        }
+
+        $this->session->set_flashdata('alert', [
+            'type' => empty($errors) ? 'success' : ($successful > 0 ? 'warning' : 'error'),
+            'message' => implode(' ', $msgParts)
+        ]);
 
         redirect('form/registration');
     }
-
-    // Show registrations in a table
-    public function view_registrations()
-    {
-        $data['registrations'] = $this->Form_model->get_all_registrations();
-        $this->load->view('view_registrations', $data);
-    }
-
-    // Handle Accept/Reject button clicks (AJAX)
-    public function update_status()
-    {
-
-        $id = $this->input->post('id');
-        $status = $this->input->post('status');
-
-        if ($this->Form_model->update_status($id, $status)) {
-            if ($status === 'accepted') {
-                $this->generate_qr_for_user($id);
-            }
-
-            $row = $this->db->get_where('registration', ['id' => $id])->row();
-            $fullName = $row->full_name;
-            $user_email = $row->email;
-            $registration = $id;
-            //$filePathNew = $row->qr_code_file;
-            $filePathNew = FCPATH . $row->qr_code_file;
-
-
-            // ✅ Send Email with attached QR
-            $this->load->library('email');
-            $this->load->config('email');
-
-            $this->email->from('someshwarkanthale0@gmail.com', 'Helicopter Show 2025');
-            $this->email->to($user_email);
-            $this->email->subject("Your Entry Pass - Helicopter Show 2025");
-
-            // HTML message
-            $message = "
-        <div style='font-family:Poppins, sans-serif; color:#333;'>
-            <h3>Dear {$fullName},</h3>
-            <p>Thank you for registering with us!</p>
-            <p>Your entry pass for the <strong>Helicopter Show 2025</strong> is below:</p>
-            <ul>
-                <li><strong>Registration ID:</strong> {$registration}</li>
-                <li><strong>Date:</strong> 1 November 2025</li>
-                <li><strong>Time:</strong> 12:00 PM</li>
-                <li><strong>Venue:</strong> CATS Upanagar, Nashik</li>
-            </ul>
-            <p>Please find your QR code attached below.</p>
-            <br>
-            <p>Warm regards,<br><strong>Helicopter Show Team</strong></p>
-        </div>";
-
-            // Attach the QR image (not inline, to avoid protected property)
-            $this->email->message($message);
-            $this->email->attach($filePathNew);
-
-            // Send the email
-            if (!$this->email->send()) {
-                echo json_encode(['success' => false, 'error' => 'Email failed: ' . $this->email->print_debugger()]);
-                return;
-            }
-
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false]);
-        }
-    }
-
-    // public function update_status()
-    // {
-    //     $id = $this->input->post('id');
-    //     $status = $this->input->post('status');
-
-    //     if (empty($id) || empty($status)) {
-    //         echo json_encode(['success' => false, 'error' => 'Missing required data']);
-    //         return;
-    //     }
-
-    //     $updated = $this->Form_model->update_status($id, $status);
-    //     if (!$updated) {
-    //         echo json_encode(['success' => false, 'error' => 'Failed to update status']);
-    //         return;
-    //     }
-
-    //     // Proceed only if accepted
-    //     if (strtolower($status) === 'accepted') {
-
-    //         $fullName = trim($this->input->post('full_name'));
-    //         $aadhaar = trim($this->input->post('aadhaar_number'));
-    //         $registration = trim($this->input->post('registration_number'));
-    //         $user_email = trim($this->input->post('email'));
-
-    //         if (empty($fullName) || empty($aadhaar) || empty($registration) || empty($user_email)) {
-    //             echo json_encode(['success' => false, 'error' => 'Missing user data']);
-    //             return;
-    //         }
-
-    //         // Include QR library
-    //         $qrLib = APPPATH . 'libraries/phpqrcode-master/qrlib.php';
-    //         if (!file_exists($qrLib)) {
-    //             echo json_encode(['success' => false, 'error' => 'QR library missing']);
-    //             return;
-    //         }
-    //         require_once($qrLib);
-
-    //         // Directory for QR codes
-    //         $qrDir = FCPATH . 'uploads/qrcodes/';
-    //         if (!is_dir($qrDir))
-    //             mkdir($qrDir, 0777, true);
-
-    //         // File name format: registration_name_QR.png
-    //         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $fullName);
-    //         $safeReg = preg_replace('/[^A-Za-z0-9_\-]/', '_', $registration);
-    //         $fileName = "{$safeReg}_{$safeName}_QR.png";
-    //         $filePath = $qrDir . $fileName;
-
-    //         // Generate QR
-    //         $qrData = "Name: {$fullName}\nAadhaar: {$aadhaar}\nRegistration ID: {$registration}";
-    //         QRcode::png($qrData, $filePath, QR_ECLEVEL_L, 6, 4);
-
-    //         // ✅ Send Email with attached QR
-    //         $this->load->library('email');
-    //         $this->load->config('email');
-
-    //         $this->email->from('someshwarkanthale0@gmail.com', 'Helicopter Show 2025');
-    //         $this->email->to($user_email);
-    //         $this->email->subject("Your Entry Pass - Helicopter Show 2025");
-
-    //         // HTML message
-    //         $message = "
-    //     <div style='font-family:Poppins, sans-serif; color:#333;'>
-    //         <h3>Dear {$fullName},</h3>
-    //         <p>Thank you for registering with us!</p>
-    //         <p>Your entry pass for the <strong>Helicopter Show 2025</strong> is below:</p>
-    //         <ul>
-    //             <li><strong>Registration ID:</strong> {$registration}</li>
-    //             <li><strong>Date:</strong> 1 November 2025</li>
-    //             <li><strong>Time:</strong> 12:00 PM</li>
-    //             <li><strong>Venue:</strong> CATS Upanagar, Nashik</li>
-    //         </ul>
-    //         <p>Please find your QR code attached below.</p>
-    //         <br>
-    //         <p>Warm regards,<br><strong>Helicopter Show Team</strong></p>
-    //     </div>";
-
-    //         // Attach the QR image (not inline, to avoid protected property)
-    //         $this->email->message($message);
-    //         $this->email->attach($filePath);
-
-    //         // Send the email
-    //         if (!$this->email->send()) {
-    //             echo json_encode(['success' => false, 'error' => 'Email failed: ' . $this->email->print_debugger()]);
-    //             return;
-    //         }
-    //     }
-
-    //     echo json_encode(['success' => true]);
-    // }
-
-    public function view_registration($id)
-    {
-        $data['student'] = $this->Form_model->get_registration_by_id($id);
-        $this->load->view('superadmin/Student_detail', $data);
-    }
-
-    private function generate_qr_for_user($id)
-    {
-        // Load DB
-        $this->load->database();
-
-        // ✅ Load the PHP QR library
-        require_once(APPPATH . 'libraries/phpqrcode/qrlib.php');
-
-        // Generate a random token
-        $token = bin2hex(random_bytes(10));
-
-        // The QR will encode this content
-        $qrContent = site_url('verify/' . $id . '?token=' . $token);
-
-        // Create QR directory if not exists
-        $qrDir = FCPATH . 'uploads/qrcodes/';
-        if (!is_dir($qrDir)) {
-            mkdir($qrDir, 0755, true);
-        }
-
-        // File name & path
-        $fileName = 'QR_' . $id . '_' . time() . '.png';
-        $filePath = $qrDir . $fileName;
-
-        // ✅ Generate the QR Code image
-        QRcode::png($qrContent, $filePath, QR_ECLEVEL_L, 5, 2);
-
-        // ✅ Save QR info in the database
-        $this->db->where('id', $id)->update('registration', [
-            'qr_code_file' => 'uploads/qrcodes/' . $fileName,
-            'qr_token' => $token,
-            'qr_issued' => 1
-        ]);
-
-    }
-
 }
