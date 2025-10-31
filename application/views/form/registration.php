@@ -247,50 +247,64 @@
                         <form action="<?php echo base_url('Form/submit_registration'); ?>" method="post"
                             enctype="multipart/form-data">
 
-                            <div class="mb-3">
-                                <label class="form-label">Full Name (as per Aadhaar) <span>*</span></label>
-                                <input type="text" name="full_name" class="form-control" placeholder="Enter your full name" required>
-                            </div>
+                            <!-- Dynamic registration blocks -->
+                            <div id="registrations-wrapper">
+                                <div class="registration-block" data-index="0">
+                                    <div class="mb-3">
+                                        <label class="form-label">Full Name (as per Aadhaar) <span>*</span></label>
+                                        <input type="text" name="full_name[]" class="form-control" placeholder="Enter your full name" required>
+                                    </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Aadhaar Number <span>*</span></label>
-                                <input type="text" name="aadhaar_number" class="form-control" maxlength="12"
-                                    placeholder="Enter  Aadhaar number" required>
-                            </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Aadhaar Number <span>*</span></label>
+                                        <input type="text" name="aadhaar_number[]" class="form-control" maxlength="12"
+                                            placeholder="Enter Aadhaar number" required>
+                                    </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Upload Aadhaar Photo/Image <span>*</span></label>
-                                <input type="file" name="userfile" class="form-control" accept="image/*" required>
-                            </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Upload Aadhaar Photo/Image <span>*</span></label>
+                                        <input type="file" name="userfile[]" class="form-control" accept="image/*" required>
+                                    </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Mobile Contact Number <span>*</span></label>
-                                    <input type="tel" name="mobile_number" class="form-control" maxlength="10"
-                                        placeholder="Enter 10-digit number" required>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Mobile Contact Number <span>*</span></label>
+                                            <input type="tel" name="mobile_number[]" class="form-control" maxlength="10"
+                                                placeholder="Enter 10-digit number" required>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Email Address </label>
+                                            <input type="email" name="email[]" class="form-control" placeholder="Enter your email ">
+                                        </div>
+                                    </div>
+
+                                    <!-- Emergency Contact Section -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Emergency Contact Name <span>*</span></label>
+                                            <input type="text" name="emergency_name[]" class="form-control"
+                                                placeholder="Enter emergency contact name" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Emergency Contact Number <span>*</span></label>
+                                            <input type="tel" name="emergency_number[]" class="form-control" maxlength="10"
+                                                placeholder="Enter emergency number" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-2 text-end">
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-block" style="display:none;">Remove</button>
+                                    </div>
+                                    <hr>
                                 </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Email Address </label>
-                                    <input type="email" name="email" class="form-control" placeholder="Enter your email ">
-                                </div>
                             </div>
 
-                            <!-- Emergency Contact Section -->
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Emergency Contact Name <span>*</span></label>
-                                    <input type="text" name="emergency_name" class="form-control"
-                                        placeholder="Enter emergency contact name" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Emergency Contact Number <span>*</span></label>
-                                    <input type="tel" name="emergency_number" class="form-control" maxlength="10"
-                                        placeholder="Enter emergency number" required>
-                                </div>
+                            <div class="d-flex gap-2 mb-3">
+                                <button type="button" id="add-registration" class="btn btn-secondary">Add registration</button>
+                                <button type="submit" class="btn btn-flag">Submit Registration</button>
                             </div>
 
-                            <button type="submit" class="btn btn-flag mt-3">Submit Registration</button>
 
                             <div class="form-footer">
                                 <p>By submitting, you confirm all details are accurate and verified with Aadhaar.</p>
@@ -309,6 +323,51 @@
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function() {
+            const wrapper = document.getElementById('registrations-wrapper');
+            const addBtn = document.getElementById('add-registration');
+
+            function updateRemoveButtons() {
+                const blocks = wrapper.querySelectorAll('.registration-block');
+                blocks.forEach((blk, idx) => {
+                    const btn = blk.querySelector('.remove-block');
+                    // hide remove on first block
+                    if (idx === 0) {
+                        btn.style.display = 'none';
+                    } else {
+                        btn.style.display = 'inline-block';
+                    }
+                });
+            }
+
+            addBtn.addEventListener('click', () => {
+                const blocks = wrapper.querySelectorAll('.registration-block');
+                const newIndex = blocks.length;
+                const clone = blocks[0].cloneNode(true);
+                clone.setAttribute('data-index', newIndex);
+                // clear inputs
+                clone.querySelectorAll('input').forEach(input => {
+                    if (input.type === 'file') input.value = '';
+                    else input.value = '';
+                });
+                wrapper.appendChild(clone);
+                updateRemoveButtons();
+            });
+
+            // delegate remove
+            wrapper.addEventListener('click', (e) => {
+                if (e.target && e.target.classList.contains('remove-block')) {
+                    const blk = e.target.closest('.registration-block');
+                    if (blk) blk.remove();
+                    updateRemoveButtons();
+                }
+            });
+
+            // initial state
+            updateRemoveButtons();
+        })();
+    </script>
     <?php if ($this->session->flashdata('alert')):
         $alert = $this->session->flashdata('alert'); ?>
         <script>
@@ -320,6 +379,58 @@
             });
         </script>
     <?php endif; ?>
+    <script>
+        (function() {
+            const wrapper = document.getElementById('registrations-wrapper');
+            const addBtn = document.getElementById('add-registration');
+            const MAX_REGISTRATIONS = 3; // 🔒 Limit to 3 registrations
+
+            function updateRemoveButtons() {
+                const blocks = wrapper.querySelectorAll('.registration-block');
+                blocks.forEach((blk, idx) => {
+                    const btn = blk.querySelector('.remove-block');
+                    btn.style.display = idx === 0 ? 'none' : 'inline-block';
+                });
+            }
+
+            addBtn.addEventListener('click', () => {
+                const blocks = wrapper.querySelectorAll('.registration-block');
+
+                if (blocks.length >= MAX_REGISTRATIONS) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Limit Reached',
+                        text: `You can only register up to ${MAX_REGISTRATIONS} participants.`,
+                        confirmButtonColor: '#3085d6'
+                    });
+                    return;
+                }
+
+                const newIndex = blocks.length;
+                const clone = blocks[0].cloneNode(true);
+                clone.setAttribute('data-index', newIndex);
+
+                // Clear all input fields in cloned block
+                clone.querySelectorAll('input').forEach(input => {
+                    input.value = '';
+                });
+
+                wrapper.appendChild(clone);
+                updateRemoveButtons();
+            });
+
+            // Handle remove button click
+            wrapper.addEventListener('click', (e) => {
+                if (e.target && e.target.classList.contains('remove-block')) {
+                    e.target.closest('.registration-block').remove();
+                    updateRemoveButtons();
+                }
+            });
+
+            updateRemoveButtons();
+        })();
+    </script>
+
 </body>
 
 </html>
