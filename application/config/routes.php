@@ -63,3 +63,7 @@ $route['export-registrants'] = 'dashboard/export_csv';
 
 $route['verify/(:num)'] = 'verify/index/$1';
 $route['view_registration'] = 'Form/view_registrations';
+
+$route['scan-monitor'] = 'scan_monitor';
+$route['scan-monitor/latest_scans'] = 'scan_monitor/latest_scans';
+
