@@ -12,6 +12,9 @@ function mask_aadhaar($aadhaar) {
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- ✅ Favicon -->
+  <link rel="icon" type="image/png" href="<?php echo base_url('assets/Images/logo.png'); ?>">
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UWS — CATS Registration Dashboard (Tricolor Theme)</title>

@@ -3,9 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Helicopter Show 2025 | QR Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" type="image/png" href="<?php echo base_url('assets/Images/logo.png'); ?>">
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
+    :root {
+      --valid-bg: linear-gradient(135deg, #00b09b, #96c93d);
+      --invalid-bg: linear-gradient(135deg, #ff4b1f, #ff9068);
+      --ticket-bg: rgba(255, 255, 255, 0.1);
+      --ticket-border: rgba(255, 255, 255, 0.3);
+    }
+
     body {
       margin: 0;
       font-family: "Poppins", sans-serif;
@@ -17,26 +30,27 @@
       text-align: center;
       overflow-x: hidden;
       transition: background 0.6s ease;
+      padding: 10px;
     }
 
     body.valid {
-      background: linear-gradient(135deg, #00b09b, #96c93d);
+      background: var(--valid-bg);
     }
 
     body.invalid {
-      background: linear-gradient(135deg, #ff4b1f, #ff9068);
+      background: var(--invalid-bg);
     }
 
-    /* 🎟️ Ticket Container */
+    /* 🎟️ Ticket */
     .ticket {
       position: relative;
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px dashed rgba(255, 255, 255, 0.3);
+      background: var(--ticket-bg);
+      border: 2px dashed var(--ticket-border);
       border-radius: 16px;
-      padding: 2rem;
-      width: 90%;
+      padding: 1.5rem;
+      width: 100%;
       max-width: 420px;
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
       animation: fadeIn 0.8s ease;
     }
 
@@ -54,17 +68,29 @@
     .ticket::before { left: -13px; }
     .ticket::after { right: -13px; }
 
+    /* ✅ Logo styling */
+    .ticket-logo {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
+      animation: popIn 0.6s ease;
+    }
+
     .event-title {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
     }
 
     .org {
       font-size: 0.9rem;
-      color: #c8f9ff;
-      margin-bottom: 1.5rem;
+      color: #d9f9ff;
+      margin-bottom: 1.2rem;
+      line-height: 1.3rem;
     }
 
     .details {
@@ -72,43 +98,68 @@
       border-radius: 12px;
       padding: 1rem;
       margin: 1.5rem 0;
-      font-size: 0.95rem;
-      color: #e7f5f3;
+      font-size: 1rem;
+      color: #f7fff7;
       box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.15);
+      line-height: 1.4rem;
     }
 
     .details p {
       margin: 0.4rem 0;
+      word-break: break-word;
     }
 
     .footer {
       font-size: 0.85rem;
-      color: #d9ffec;
+      color: #e9ffee;
       margin-top: 1rem;
     }
 
-    /* ✅ Subtle Animation */
+    /* ✅ Animations */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Mobile adjustments */
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ✅ Mobile optimization */
     @media (max-width: 576px) {
       .ticket {
-        padding: 1.5rem;
-        width: 95%;
+        max-width: 100%;
+        padding: 1.2rem;
+        border-width: 1.5px;
+      }
+
+      .ticket-logo {
+        width: 60px;
+        height: 60px;
       }
 
       .event-title {
         font-size: 1.3rem;
+      }
+
+      .details {
+        font-size: 0.95rem;
+        padding: 0.9rem;
+      }
+
+      .footer {
+        font-size: 0.8rem;
       }
     }
   </style>
 </head>
 
 <body class="<?= isset($status) && $status === 'valid' ? 'valid' : 'invalid' ?>">
+
   <div class="ticket">
+    <!-- ✅ Logo -->
+    <img src="<?php echo base_url('assets/Images/logo.png'); ?>" alt="UWS Logo" class="ticket-logo">
 
     <?php if (isset($status) && $status === 'valid'): ?>
       <?php 
@@ -117,7 +168,10 @@
       ?>
 
       <h3 class="event-title">HELICOPTER SHOW 2025</h3>
-      <div class="org">Organised by United We Stand Foundation<br>in collaboration with Combat Army Aviation Training School (CATS), Nashik</div>
+      <div class="org">
+        Organised by <strong>United We Stand Foundation</strong><br>
+        in collaboration with <strong>CATS, Nashik</strong>
+      </div>
 
       <h5 class="text-light mb-3">✅ Verification Successful</h5>
 
@@ -148,7 +202,7 @@
       </p>
 
       <p class="footer">
-        Report suspicious passes to security staff immediately.
+        Report suspicious passes to event security immediately.
       </p>
     <?php endif; ?>
   </div>
