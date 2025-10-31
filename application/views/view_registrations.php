@@ -260,7 +260,8 @@
   <div class="container">
     <div class="top-bar d-flex justify-content-between align-items-center">
       <div>
-        <div style="font-weight:700; font-size:1.1rem">UWS — <span style="color:var(--saffron)">CATS</span> Registrations</div>
+        <div style="font-weight:700; font-size:1.1rem">UWS — <span style="color:var(--saffron)">CATS</span>
+          Registrations</div>
         <div style="color:var(--muted); font-size:.9rem">Registered user details • Manage status</div>
       </div>
       <div class="text-end" style="color:var(--muted)">Host: PHP / LAMP-ready</div>
@@ -315,8 +316,7 @@
                   <!-- Aadhaar Image -->
                   <td>
                     <?php if (!empty($reg['aadhaar_image'])): ?>
-                      <img src="<?php echo base_url('uploads/aadhaar/' . $reg['aadhaar_image']); ?>"
-                        alt="Aadhaar Image"
+                      <img src="<?php echo base_url('uploads/aadhaar/' . $reg['aadhaar_image']); ?>" alt="Aadhaar Image"
                         class="img-thumbnail aadhaar-thumb"
                         onclick="showImage('<?php echo base_url('uploads/aadhaar/' . $reg['aadhaar_image']); ?>')">
 
@@ -355,14 +355,42 @@
                   <!-- Action Buttons -->
                   <td>
                     <div class="action-buttons d-flex justify-content-center gap-2 p-2 rounded-3">
-                      <button class="btn btn-sm btn-accept flex-fill" onclick="updateStatus(<?php echo $reg['id']; ?>,'accepted')">
+                      <button class="btn btn-sm btn-accept flex-fill"
+                        onclick="updateStatus(<?php echo $reg['id']; ?>,'accepted')">
                         <i class="bi bi-check-circle"></i> Accept
                       </button>
-                      <button class="btn btn-sm btn-reject flex-fill" onclick="updateStatus(<?php echo $reg['id']; ?>,'rejected')">
+                      <button class="btn btn-sm btn-reject flex-fill"
+                        onclick="updateStatus(<?php echo $reg['id']; ?>,'rejected')">
                         <i class="bi bi-x-circle"></i> Reject
                       </button>
                     </div>
                   </td>
+
+                  <!-- <td>
+
+                    <div class="action-buttons d-flex justify-content-center gap-2 p-2 rounded-3">
+
+                      <button class="btn btn-sm btn-accept flex-fill" onclick="updateStatus(<?php echo $reg['id']; ?>,'accepted',
+
+                                                '<?php echo htmlspecialchars(addslashes($reg['full_name'])); ?>',
+
+                                                '<?php echo htmlspecialchars(addslashes($reg['aadhaar_number'])); ?>',
+
+                                                '<?php echo htmlspecialchars(addslashes($reg['email'])); ?>')">
+
+                        <I class="bi bi-check-circle"></I> Accept
+
+                      </button>
+
+                      <button class="btn btn-sm btn-reject flex-fill" onclick="updateStatus(<?php echo $reg['id']; ?>,'rejected')">
+
+                        <I class="bi bi-x-circle"></I> Reject
+
+                      </button>
+
+                    </div>
+
+                  </td> -->
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
@@ -375,16 +403,18 @@
       </div>
     </div>
 
-    <footer class="text-center" style="color:var(--muted)">United We Stand Foundation • Manasvi Tech Solutions Pvt Ltd © <?php echo date('Y'); ?></footer>
+    <footer class="text-center" style="color:var(--muted)">United We Stand Foundation • Manasvi Tech Solutions Pvt Ltd ©
+      <?php echo date('Y'); ?>
+    </footer>
   </div>
   <div id="imageModal" class="image-modal">
     <span class="close-btn" onclick="closeModal()">&times;</span>
     <img class="modal-content" id="modalImg" alt="Aadhaar Full Image">
   </div>
   <script>
-    $("#globalSearch").on("keyup", function() {
+    $("#globalSearch").on("keyup", function () {
       var value = $(this).val().toLowerCase();
-      $("table tbody tr").filter(function() {
+      $("table tbody tr").filter(function () {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
       });
     });
@@ -392,8 +422,8 @@
     function updateStatus(id, status) {
       $.post("<?php echo site_url('form/update_status'); ?>", {
         id: id,
-        status: status
-      }, function(response) {
+        status: status,
+      }, function (response) {
         try {
           const data = (typeof response === 'object') ? response : JSON.parse(response);
           if (data.success) {
@@ -413,7 +443,6 @@
         }
       });
     }
-
     // Aadhaar Image Zoom Modal
     function showImage(src) {
       const modal = document.getElementById("imageModal");
@@ -430,7 +459,7 @@
     }
 
     // Close modal on background click
-    document.getElementById("imageModal").addEventListener("click", function(e) {
+    document.getElementById("imageModal").addEventListener("click", function (e) {
       if (e.target === this) closeModal();
     });
   </script>

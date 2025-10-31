@@ -393,7 +393,7 @@ function mask_aadhaar($aadhaar) {
 <a href="<?php echo site_url('new-registration'); ?>" class="btn btn-outline-light">
   <i class="fa-solid fa-user-plus"></i> New Registration
 </a>
-<a href="<?php echo site_url('registrations'); ?>" class="btn btn-outline-light">
+<a href="<?php echo site_url('view_registration'); ?>" class="btn btn-outline-light">
   <i class="fa-solid fa-ticket"></i> View All Registrations
 </a>
             <button class="btn btn-outline-light" onclick="showHelp()"><i class="fa-solid fa-circle-info"></i> SOP & Help</button>

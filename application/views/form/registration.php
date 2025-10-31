@@ -244,7 +244,7 @@
                     <div class="registration-form">
                         <h3 class="form-title">Secure Registration Form</h3>
 
-                        <form action="<?php echo site_url('form/submit_registration'); ?>" method="post"
+                        <form action="<?php echo base_url('Form/submit_registration'); ?>" method="post"
                             enctype="multipart/form-data">
 
                             <div class="mb-3">
@@ -302,7 +302,7 @@
 
             <!-- Right: Image Outside Form -->
             <div class="col-lg-4 image-section">
-                <img src="<?php echo base_url('assets/images/image.png'); ?>" alt="Secure Registration">
+                <img src="<?php echo base_url('assets/Images/image.png'); ?>" alt="Secure Registration">
             </div>
         </div>
     </div>
